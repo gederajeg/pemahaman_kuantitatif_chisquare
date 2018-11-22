@@ -1,0 +1,351 @@
+---
+title: "Pemahaman kuantitatif dasar dan penerapannya dalam mengkaji keterkaitan antara bentuk dan makna"
+csl: apa-old-doi-prefix.csl
+link-citations: yes
+output:
+  html_notebook:
+    code_folding: hide
+    fig_caption: yes
+    fig_width: 6
+    number_sections: yes
+    toc: yes
+    toc_float: no
+  word_document:
+    toc: yes
+  bookdown::word_document2:
+    df_print: kable
+    fig_caption: yes
+    fig_width: 6
+    reference_docx: ebhs_2018_TEMPLATE.docx
+  bookdown::html_document2:
+    code_folding: hide
+    toc: yes
+    toc_float: yes
+bibliography: reference.bib
+---
+
+^1^^,^ ^2^ Gede Primahadi Wijaya Rajeg & ^1^ I Made Rajeg
+
+^1^ Universitas Udayana, Indonesia & ^2^ Monash University, Australia
+
+primahadiwijaya@gmail.com & made_rajeg@unud.ac.id
+
+**Abstrak**
+
+Makalah ini memaparkan pemahaman kuantitatif mendasar, khususnya teknik statistik analitik *Chi-Square* ($\chi^2$), dan penerapannya untuk permasalahan linguistik terkait hubungan antara bentuk dan makna. Berdasarkan data dari *Indonesian Web as Corpus*, makalah ini menggunakan medan leksikal <span style = "font-variant:small-caps;">panas</span> sebagai contoh untuk mengukur keterkaitan antara pemakaian (non-)metaforis dan bentuk morfosintaksis kata berdasarkan sampel sitiran verba berakar *panas*, dan kata *panas* itu sendiri. Analisis $\chi^2$ menunjukkan keterkaitan yang sangat signifikan dan kuat antara realisasi morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span> dan distribusi pemakaian (non-)metaforisnya. Efek keterkaitan yang paling kuat ditunjukkan oleh bentuk inkohatif *memanas* yang berasosiasi positif dengan pemakaian metaforis, dan bentuk *dipanaskan* dan *panas* yang berasosiasi negatif dengan pemakaian metaforis. Temuan ini berimplikasi terhadap adanya batasan semantis dominan terkait wujud morfosintaksis suatu kata, fenomena yang dapat mencerminkan keterkaitan antara bentuk dan makna pada bahasa. 
+
+*Kata kunci*: *Chi-Square*; Linguistik Korpus Kuantitatif; bahasa pemrograman R; metafora; keberpasangan bentuk-dan-makna; medan leksikal <span style = "font-variant:small-caps;">panas</span>; Bahasa Indonesia
+
+**Abstract**
+
+This contribution discusses basic concepts of *Chi-Square* ($\chi^2$) test as a kind of analytical statistics and illustrates its application to one of the central issues in linguistics, namely form-meaning relationship. As a case study using *Indonesian Web as Corpus* from the *Sketch Engine*, this paper measures the association between morphosyntactic forms of words in the lexical field of <span style = "font-variant:small-caps;">*panas*</span> 'hot' and their (non-)metaphorical usages. The $\chi^2$ test demonstrates a highly significant and robust correlation between the morphosyntactic form of words with the root *panas* 'hot' and their preference for (non-)metaphorical usages. The clear effects are shown by (i) the strong preference of the inchoative form *memanas* 'to become hot' for metaphorical usage, and (ii) the strong dispreference of *dipanaskan* 'to be caused to be hot' and *panas* 'hot' for metaphorical usage. This finding has implication on the dominant semantic restriction of words with certain morphosyntactic forms, thus capturing the form-meaning relationship in language.
+
+*Keywords*: *Chi-Square*; Quantitative Corpus Linguistics; R programming language; metaphors; form-meaning pairing; lexical field of <span style = "font-variant:small-caps;">*panas*</span>; Indonesian
+
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, echo = FALSE}
+knitr::opts_chunk$set(fig.width = 6, 
+                      fig.asp = 0.618,
+                      dpi = 300,
+                      echo = FALSE,
+                      tidy = FALSE)
+
+library(tidyverse)
+library(vcd)
+```
+
+# Pendahuluan^[Penulisan makalah ini didukung oleh dana penelitian doktoral dari Monash University, Australia yang diberikan kepada Gede Primahadi Wijaya Rajeg: *Monash International Postgraduate Research Scholarships* (MIPRS) & *Monash Graduate Scholarships* (MGS).] {#pendahuluan}
+
+Memasuki awal abad ke-21, penelitian linguistik umumnya, dan Linguistik Kognitif (LKog) khususnya, semakin gencar bergerak menuju pendekatan kuantitatif menggunakan beragam metode statistik untuk pengolahan data; pergerakan ini diistilahkan dengan "*the quantitative turn*" [@janda_quantitative_2013; @levshina_how_2015, hlm. 2-3]. Revolusi kuantitatif ini utamanya dipicu oleh (i) pergeseran teoretis ke arah pendekatan linguistik berdasarkan pemakaian (*usage-based linguistics*), seperti halnya LKog [@tummers_usage-based_2005]; (ii) ketersediaan sejumlah bank data elektronik pemakaian bahasa (*linguistic corpora*) yang ukurannya bisa mencapai miliaran bahkan triliunan kata; dan (iii) keberadaan piranti statistik komputasional tak berbayar, utamanya R [@rcore_2018], yang semakin lazim di kalangan peneliti bahasa khususnya [@janda_quantitative_2013; @gries_statistics_2013; @levshina_how_2015] maupun pakar pengolahan data (*data scientists*) secara umum. 
+
+Asas pemakaian (*usage-based assumption*) yang melandasi pendekatan linguistik seperti LKog berimplikasi metodologis terhadap pentingnya keberadaan data empiris dalam kajian kebahasaan [@tummers_usage-based_2005]. Asas pemakaian menekankan bahwa kajian linguistik mesti didasarkan atas data pemakaian nyata, seperti yang diamati pada korpus pemakaian bahasa [@glynn_corpus-driven_2010, hlm. 10; @janda_linguistic_2016, hlm. 130], atau yang bisa diperoleh melalui survei dan eksperimen [@tummers_usage-based_2005, hlm. 229]. Asumsi mendasar dari pendekatan linguistik berdasarkan pemakaian ialah pengetahuan dan khasanah kebahasaan penutur dibentuk oleh pemakaian bahasa [@janda_linguistic_2016, hlm. 129-131]. Selain itu, pengalaman berkelanjutan seorang penutur dalam berkomunikasi dan menerima masukan kebahasaan (*linguistic input*) mengikutkan tersimpannya informasi kuantitatif terkait konteks pemakaian suatu kata dan kekerapan kemunculan bersama (*co-occurrence frequencies*) seperangkat kata dan konstruksi [@levshina_how_2015, hlm. 3]. Kedua asumsi tersebut dapat diuji secara lebih empiris, di antaranya melalui pendekatan linguistik korpus kuantitatif dan metode eksperimental. 
+
+Penting untuk dicatat bahwa revolusi kuantitatif bukan berarti mengesampingkan intuisi dalam penelitian kebahasaan [bdk. @janda_quantitative_2013, hlm. 3]. Intuisi tetap berperan penting, utamanya dalam (i) memaknai/interpretasi data dan (ii) merumuskan praanggapan, hipotesis, dan permasalahan teoretis dalam linguistik. Ketersediaan bank data dan penerapan metode kuantitatif bertujuan untuk membantu perumusan dan pemaparan permasalahan linguistik secara lebih empiris dan terukur [@stefanowitsch_empirical_2010]. Dengan kata lain, salah satu keuntungan dari penerapan metode linguistik korpus kuantitatif adalah informasi kuantitatif yang dapat diolah secara statistik guna mendukung dan/atau mengajukan argumentasi teoretis terkait suatu fenomena kebahasaan. Hasil tersebut selanjutnya akan kembali menjadi hipotesis yang dapat digugurkan atau didukung oleh penelitian empiris selanjutnya. Akan tetapi, menggabungkan permasalahan teoretis dengan pendekatan kuantitatif bukan hal yang mudah [@janda_linguistic_2016, hlm. 128]. Penyebabnya ialah bahwa perihal teoretis tidak secara gamblang mensyaratkan penerapan metode kuantitatif tertentu, dan analisis kuantitatif tidak selalu menjamin adanya relevansi teoretis. Jadi, peneliti berperan sangat penting dalam merumuskan permasalahan teoretis yang tepat dan dapat dijawab dengan pendekatan kuantitatif [@stefanowitsch_empirical_2010; @janda_linguistic_2016; @tummers_usage-based_2005, hlm. 238].  
+
+Makalah ini memberikan contoh sederhana namun mendasar terkait bagaimana pendekatan kuantitatif dapat menerangkan permasalahan teoretis dalam linguistik [@kuznetsova_linguistic_2015; @glynn_corpus-driven_2010; @gries_statistics_2013; @janda_linguistic_2016; @janda_cognitive_2013; @levshina_how_2015; @tummers_usage-based_2005]. Salah satu pertanyaan utama, atau "*Big Questions*" [@janda_linguistic_2016, hlm. 128], dalam linguistik ialah hubungan antara bentuk (*form*) dan makna (*meaning*) [@kuznetsova_linguistic_2015]. Pendekatan linguistik seperti LKog memandang bentuk dan makna sebagai kesatuan penting dari bahasa dan dapat dikaji melalui pendekatan kuantitatif [@glynn_corpus-driven_2010; @janda_linguistic_2016; @stefanowitsch_empirical_2010]. Mengkaji hubungan antara bentuk dan makna berdasarkan asas pemakaian mengikutkan bahwa (i) perbedaan pemakaian suatu bentuk linguistik mengindikasikan perbedaan makna dari bentuk tersebut [periksa @kuznetsova_linguistic_2015, hlm. 13-14; @stefanowitsch_empirical_2010, hlm. 368-370], dan (ii) perbedaan bentuk tentunya mencerminkan perbedaan makna [@janda_linguistic_2016, hlm. 129]. 
+
+Menggunakan objek kajian pemakaian (non-)metaforis medan leksikal <span style = "font-variant:small-caps;">panas</span> dalam Bahasa Indonesia (§[\@ref(data)](#data)), makalah ini akan menunjukkan bahwa terdapat perbedaan distribusi pemakaian (non-)metaforis berkaitan dengan wujud morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span>. Kajian serupa telah dilakukan sebelumnya oleh Deignan [-@deignan_grammar_2006] dengan data korpus Bahasa Inggris. Deignan mengamati bahwa suatu kata akan cenderung digunakan secara metaforis dalam kelas kata yang berbeda dan pola sintaksis tertentu. Misalnya, proporsi pemakaian literal untuk lema *blossom* secara signifikan lebih tinggi dalam fungsinya sebagai nomina; sebaliknya proporsi pemakaian metaforisnya lebih tinggi ketika berfungsi sebagai verba [@deignan_grammar_2006, hlm. 112]. Contoh serupa dalam Bahasa Indonesia dapat ditemui pada verba denominal seperti *mengepalai* (dari akar nomina *kepala*) dan *menangani* (dari akar nomina *tangan*); kedua verba ini memiliki makna metaforis (mis. *mengepalai* selalu berarti 'memimpin'), sedangkan akar nominanya masih bisa digunakan baik secara literal untuk mengacu pada anggota badan maupun secara metaforis (mis. _**kepala**_ *negara* 'presiden' atau _**tangan**_ *kanan* 'orang kepercayaan'). Temuan ini mencerminkan bagaimana makna tertentu (misalnya metaforis dan literal) berkaitan erat dengan ciri morfosintaksis suatu kata [bdk. @janda_linguistic_2016, hlm. 129; @kuznetsova_linguistic_2015]. 
+
+Kandungan pokok dari makalah ini terkait permasalahan di atas ialah pemaparan mendasar terhadap pemahaman analisis statistik yang digunakan, mulai dari yang bersifat deskriptif (§[\@ref(deskripsi)](#deskripsi)) hingga analitik (*inferential/analytical statistics*) (§[\@ref(signifikansi)](#signifikansi)) [@gries_statistics_2013, Bab 4]. Teknik statistik yang dibahas adalah uji signifikansi dengan *Chi-Square* (§[\@ref(chisquare)](#chisquare)), yang lazim digunakan untuk mengukur keterkaitan antara dua atau lebih variabel, yang dalam hal ini adalah <span style = "font-variant:small-caps;">bentuk morfosintaksis</span> medan leksikal <span style = "font-variant:small-caps;">panas</span> dan <span style = "font-variant:small-caps;">makna</span> (metaforis dan literal). Makalah ini juga menyisipkan bagian terkait penggunaan R untuk melakukan uji statistik *Chi-Square* (§[\@ref(chisqr)](#chisqr)).
+
+# Data {#data}
+
+```{r unggah-data, message = FALSE, warning = FALSE, echo = FALSE}
+panas <- read.table(file = "data/panas_raw.txt", header = TRUE, sep = "\t", quote = "", comment.char = "", stringsAsFactors = FALSE)
+```
+
+Korpus yang menjadi sumber data makalah ini ialah *Indonesian Web as Corpus* (IWaC) (109.281.359 juta kata) [@kilgarriff_2014_sketch]. IWaC tersedia daring melalui layanan korpus berbayar *Sketch Engine* (SE) (https://www.sketchengine.eu/). Penulis mencari 100 sampel sitiran acak pemakaian kata-kata dengan akar kata *panas*, yaitu *panas* itu sendiri, kemudian bentuk turunannya sebagai kata kerja, utamanya *memanas*, *memanaskan*, *dipanaskan*, *dipanasi* dan *memanasi*; gugusan kata tersebut tercakup dalam medan leksikal <span style="font-variant:small-caps;">panas</span>. Penulis menyadari terdapat beberapa bentuk lain yang tidak diikutkan dalam makalah ini, misalnya *berpanas-panasan*, *sepanas*, *terpanas*, *kepanasan*, dan lainnya. Namun, hal tersebut dianggap tidak menghalangi tujuan utama makalah ini untuk memperkenalkan pemahaman dasar atas uji signifikansi *Chi-Square* dan penerapannya terhadap salah satu kajian linguistik. Pencarian sampel sitiran untuk kata yang diteliti dilakukan dalam rentang waktu 30 hari percobaan akun gratis untuk SE di pertengahan tahun 2013. Tabel [\@ref(tab:conc)](#conc) menampilkan lima sitiran acak dari total `r nrow(panas)` sitiran medan leksikal <span style="font-variant:small-caps;">panas</span> yang dikaji, dengan tampilan konteks di sebelah kiri (*left*) dan kanan (*right*) dari kata kunci (*node*).
+
+```{r simpan-sampel, echo = FALSE, eval = FALSE}
+panas_sample <- dplyr::sample_n(panas, 5)
+readr::write_tsv(panas_sample, "data/panas_sample.txt")
+```
+
+```{r conc, message = FALSE}
+panas_sample <- readr::read_tsv("data/panas_sample.txt")
+panas_sample <- dplyr::mutate(panas_sample,
+                              left = substr(left, round(nchar(left)/2) + 5, nchar(left)),
+                              right = substr(right, 1, round(nchar(right)/2) + 5),
+                              left = stringr::str_replace_all(left, "</?p>", "."),
+                              right = stringr::str_replace_all(right, "</?p>", "."))
+knitr::kable(panas_sample, align = "crclc", caption = "Lima sitiran konkordansi acak medan leksikal <span style='font-variant:small-caps;'>panas</span>")
+```
+
+Kolom *id* merupakan penanda sitiran yang dikeluarkan dari pencarian konkordansi di SE. Kemudian, kolom *use* merupakan variabel yang menandai apakah baris sitiran untuk suatu kata kunci menunjukkan pemakaian "lit(eral)" atau "met(aforis)". Peneliti menemukenali kedua pemakaian tersebut secara manual dengan melihat konteks pemakaian kata kunci pada masing-masing sitiran berdasarkan *Metaphor Identification Procedure* (MIP) [@pragglejaz_group_mip:_2007], sembari menandainya melalui *Excel*. Pemakaian literal kata-kata tersebut secara umum mengacu pada pemakaiannya pada ranah suhu yang bersifat badaniah (periksa sitiran tiga baris pertama pada Tabel [\@ref(tab:conc)](#conc)). Sedangkan pemakaian metaforisnya menunjukkan pemetaan unsur suhu badaniah ke ranah yang lebih abstrak, seperti emosi atau intensitas suatu keadaan (seperti pada dua baris terakhir pada Tabel [\@ref(tab:conc)](#conc)). Sitiran ganda (*duplicates*) secara manual ditandai dan tidak diikutkan dalam analisis kuantitatif selanjutnya. Semua analisis statistik, termasuk tabel dan grafik, dan penulisan makalah ini dilakukan melalui *RStudio* menggunakan *R Markdown Notebook* dan dua modul R pendukung, yaitu *tidyverse* (https://www.tidyverse.org) dan *vcd* [@zeileis_residual_2007; @meyer_vcd_2017]. Data sitiran yang dikaji dan berkas *R Notebook* tersedia daring dan terbuka melalui tautan berikut: **`AKAN DIISI BILA MAKALAH DITERIMA`**.
+
+# Hasil dan pembahasan
+
+Bagian ini meliputi tiga pokok pembahasan. Hal pertama merupakan analisis statistik yang bersifat deskriptif (§[\@ref(deskripsi)](#deskripsi)). Hal kedua mencakup pemahaman terkait signifikansi statistik dan hipotesis ilmiah (§[\@ref(signifikansi)](#signifikansi)), serta uji signifikansi statistik menggunakan *Chi-Square* (§[\@ref(chisquare)](#chisquare)). Hal terakhir ialah cara melakukan *Chi-Square* menggunakan R (§[\@ref(chisqr)](#chisqr)).  
+
+## Memahami data melalui tabel dan grafik {#deskripsi}
+
+Pemaparan deskriptif terkait distribusi kategori yang dicakup variabel <span style="font-variant:small-caps;">bentuk morfosintaksis</span> (*panas*, *memanas*, *memanasi*, dsb.) dan <span style="font-variant:small-caps;">makna</span> (*lit*(*eral*) dan *met*(*aforis*)) dapat diawali dengan tabulasi kekerapan silang (*crosstabulation*) seperti pada Tabel [\@ref(tab:cross-tab)](#cross-tab) berikut.
+
+```{r cross-tab}
+pemakaian <- panas$use
+kata <- panas$node
+panas_xtab <- table(pemakaian, kata)
+panas_xtab_sum <- addmargins(panas_xtab)
+attr(panas_xtab_sum, "dimnames")[[1]][3] <- "total"
+attr(panas_xtab_sum, "dimnames")[[2]][7] <- "total"
+knitr::kable(panas_xtab_sum, caption = 'Kekerapan riil antara kategori <span style="font-variant:small-caps;">makna</span> (baris) dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span> (kolom)')
+```
+
+Tampak bahwa, misalnya, pemakaian literal bentuk pasif *dipanasi* (`r nrow(panas[panas$node == "dipanasi" & panas$use == "lit", ])` sitiran) berjumlah lebih sedikit dibandingkan dengan bentuk aktif *memanasi* (`r nrow(panas[panas$node == "memanasi" & panas$use == "lit", ])`). Namun, yang perlu diperhatikan ialah jumlah keseluruhan sampel dari masing-masing kata berbeda. Misalnya, pencarian 100 sampel untuk bentuk *dipanasi* di SE hanya menghasilkan total `r nrow(panas[panas$node == "dipanasi", ])` sitiran, demikian halnya dengan *memanasi* (`r nrow(panas[panas$node == "memanasi", ])` sitiran). Untuk dapat melakukan perbandingan yang seimbang, sebaiknya nilai kekerapan disamakan terlebih dahulu [@levshina_how_2015, hlm. 70]. Penyamaannya bisa dalam bentuk (i) kekerapan relatif (*relative frequency* atau *proportion* dalam bentuk bilangan desimal dengan rentangan antara 0 sampai 1) (Periksa Tabel [\@ref(tab:prop-table)](#prop-table) berikut), (ii) persentase, atau (iii) kekerapan berdasarkan suatu bilangan acuan (misalnya kekerapan per 100 atau 1000 sitiran) yang dikenal dengan istilah *normalised frequency* [@gries_useful_2010, hlm. 271]. 
+
+```{r prop-table}
+panas_prop <- prop.table(panas_xtab, 2)
+panas_prop_df <- dplyr::as_data_frame(panas_prop)
+knitr::kable(round(panas_prop, 2), caption = 'Kekerapan relatif/proporsi antara kategori <span style="font-variant:small-caps;">makna</span> dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span>')
+```
+
+Kini dapat diperhatikan bahwa proporsi pemakaian literal dari total sitiran *dipanasi* relatif lebih tinggi (yaitu `r dplyr::filter(panas_prop_df, pemakaian == "lit", kata == "dipanasi")[["n"]]` atau `r dplyr::filter(panas_prop_df, pemakaian == "lit", kata == "dipanasi")[["n"]] * 100`%) dibandingkan dengan *memanasi* (sekitar `r round(dplyr::filter(panas_prop_df, pemakaian == "lit", kata == "memanasi")[["n"]], 2)` atau `r round(dplyr::filter(panas_prop_df, pemakaian == "lit", kata == "memanasi")[["n"]] * 100, 2)`%). Proporsi makna literal dan metaforis untuk suatu kata diperoleh dengan membagi kekerapan suatu jenis makna dengan total sitiran kata tersebut. Sebagai contoh, penghitungan proporsi makna literal *dipanasi* adalah $\frac{`r panas_xtab["lit", "dipanasi"]`}{`r sum(panas_xtab[, "dipanasi"])`}$, yaitu `r panas_xtab["lit", "dipanasi"]/sum(panas_xtab[, "dipanasi"])`, dan proporsi metaforisnya adalah $\frac{`r panas_xtab["met", "dipanasi"]`}{`r sum(panas_xtab[, "dipanasi"])`}$, yaitu `r panas_xtab["met", "dipanasi"]/sum(panas_xtab[, "dipanasi"])`. Informasi pada Tabel [\@ref(tab:cross-tab)](#cross-tab) dan Tabel [\@ref(tab:prop-table)](#prop-table) dapat dipahami secara lebih intuitif melalui tampilan visual diagram batang seperti Gambar [\@ref(fig:barplot)](#barplot), yang dihasilkan menggunakan modul *ggplot2* [@wickham_ggplot_2016] sebagai bagian dari *tidyverse*.
+
+```{r barplot, echo = FALSE, fig.cap = "Proporsi sitiran literal dan metaforis terkait bentuk morfosintaksis medan leksikal <span style = 'font-variant:small-caps;'>panas</span>"}
+# co-occurrence count of the panas words and their usages
+panas_use <-
+  panas %>% 
+  dplyr::count(node, use) %>% 
+  dplyr::arrange(dplyr::desc(node), dplyr::desc(n))
+
+# panas proportion plot
+panas_use %>% 
+  ggplot(aes(x = node, y = n, fill = use)) +
+  geom_col(position = "fill") +
+  geom_text(aes(label = n), 
+            position = position_fill(0.9),
+            colour = rep(c("black", "white"), 6),
+            size = 3,
+            hjust = 1) +
+  labs(x = NULL,
+       y = "Proporsi",
+       fill = "pemakaian",
+       caption = "Angka di dalam grafik batang menunjukkan kekerapan riil") +
+  scale_fill_grey() +
+  theme_bw() +
+  coord_flip()
+```
+
+Terlihat jelas bahwa verba inkohatif *memanas* memiliki proporsi sitiran metaforis yang paling tinggi dibandingkan bentuk verba lainnya, yang didominasi oleh pemakaian literal. Ulasan deskriptif ini dapat mengindikasikan peluang adanya hubungan antara morfosintaksis kata berakar sama dan makna tertentu yang cenderung disampaikannya. Pertanyaan selanjutnya adalah bagaimana cara menentukan secara empiris bahwa perbedaan distribusi makna dari sampel pemakaian medan leksikal <span style="font-variant:small-caps;">panas</span> ini penting dan bukanlah suatu kebetulan? Dengan kata lain, bagaimana kita mengetahui bahwa distribusi tersebut **signifikan secara statistik**? Berkaitan dengan pertanyaan ini, §[\@ref(signifikansi)](#signifikansi) berikut mengulas secara ringkas pemahaman istilah **signifikansi statistik**.
+
+## Signifikansi statistik dan hipotesis ilmiah {#signifikansi}
+
+Signifikansi statistik merujuk pada pertanyaan apakah perbedaan distribusi, yang diamati dalam sampel, hanya merupakan suatu kebetulan (*based on chance*) [@gries_statistics_2013, hlm. 28; @stefanowitsch_quantitative_2004]^[Pranala untuk tutorial oleh Stefanowitsch [-@stefanowitsch_quantitative_2004] sudah tidak aktif sejak tahun 2012.]. Distribusi dikatakan signifikan secara statistik apabila peluang (*likelihood* atau *probability*) bahwa distribusi tersebut dianggap acak/manasuka (*random*) lebih kecil dari 5%; nilai ini diistilahkan dengan **tingkat signifikansi** (*p~critical~*) dan umumnya ditulis dalam bentuk desimal, yaitu 0.05 (hasil dari 5/100) [@gries_statistics_2013, hlm. 27; @podesva_basic_2014, hlm. 317; @janda_quantitative_2013, hlm. 9-10].  
+
+Jika dikaitkan dengan contoh kajian makalah ini, signifikansi statistik merujuk pada peluang ditemukannya perbedaan persebaran pemakaian literal dan metaforis terkait bentuk morfosintaksis medan leksikal <span style="font-variant:small-caps;">panas</span> (seperti pada Tabel [\@ref(tab:cross-tab)](#cross-tab)) **apabila benar adanya** bahwa seharusnya tidak ada perbedaan persebaran makna literal dan metaforis terkait realisasi morfosintaksis dari medan leksikal <span style="font-variant:small-caps;">panas</span> tersebut. Hal yang penting untuk diperhatikan ialah signifikansi statistik dari distribusi suatu fenomena kebahasaan tidak akan pernah menjamin signifikansinya secara linguistik, dalam arti, tidak menunjukkan karakteristik penting suatu sistem kebahasaan [bdk. @gries_statistics_2013, hlm. 28]. Namun, jika distribusi suatu fenomena kebahasaan tidak signifikan secara statistik, maka hal menarik sehubungan dengan pola kebahasaan tersebut mungkin tidak akan terangkat [periksa @stefanowitsch_quantitative_2004].
+
+Analisis statistik terkait uji signifikansi melibatkan dua hipotesis yang diuji berdasarkan data, yaitu (i) **hipotesis kosong** (*null hypothesis*) (selanjutnya disebut H~0~) dan (ii) **hipotesis alternatif** (*alternative hypothesis*) (H~1~) [@levshina_how_2015, hlm. 8-9; @podesva_basic_2014, hlm. 317]. H~0~ umumnya menyatakan distribusi setara/acak, atau ketidakterkaitan di antara variabel yang dikaji. H~1~ sebaliknya menggangap adanya keterkaitan di antara variabel berdasarkan perbedaan distribusinya [periksa @gries_statistics_2013, hlm. 10-14]. Berikut dipaparkan dua hipotesis yang berkaitan dengan makalah ini:
+
+- H~0~ (hipotesis kosong): Rasio pemakaian literal dan metaforis **tidak berbeda** sehubungan dengan beragam bentuk morfosintaksis kata-kata pada medan leksikal <span style = "font-variant:small-caps;">panas</span>. Artinya, bentuk intransitif *memanas*, transitif *memanaskan* dan bentuk pasif-nya *dipanaskan* seharusnya memiliki distribusi pemakaian literal dan metaforis yang setara dalam sampel.
+- H~1~ (hipotesis alternatif): Rasio pemakaian literal dan metaforis **berbeda** sehubungan dengan beragam bentuk morfosintaksis kata-kata pada medan leksikal <span style = "font-variant:small-caps;">panas</span> tersebut. Dengan kata lain, diasumsikan bahwa terdapat kaitan antara bentuk morfosintaksis kata pada medan leksikal <span style = "font-variant:small-caps;">panas</span> dengan proporsi makna literal dan metaforis terkait pemakaian kata tersebut dalam korpus.
+
+Hal yang tidak diperinci dari H~1~ terkait perbedaan distribusi ini ialah arah perbedaannya. Yaitu, apakah misalnya *memanaskan*, dibandingkan dengan *memanasi*, lebih sering (atau lebih jarang) digunakan secara metaforis (dibandingkan secara literal) dalam sampel korpus. Inti yang disampaikan oleh H~1~ adalah adanya perbedaan distribusi. Arah dari perbedaan distribusi tersebut tidak dapat diperinci untuk saat ini karena belum ditemukannya kajian sebelumnya dalam Bahasa Indonesia yang melihat kaitan antara bentuk morfosintaksis kata berakar sama dengan makna literal dan/atau metaforis yang disampaikan dalam pemakaian kata tersebut. Meskipun demikian, perlu diketahui bahwa Siahaan [-@siahaan_why_2015] telah melakukan kajian metafora konseptual terkait pemakaian medan leksikal <span style = "font-variant:small-caps;">temperatur</span> dalam Bahasa Indonesia, namun dengan menggabungkan semua realisasi morfosintaksis guna mencerminkan suatu jenis temperatur. Misalnya, pemakaian metaforis *kepanasan*, *memanaskan*, *panas*, digabungkan ke dalam sitiran metaforis konsep <span style = "font-variant:small-caps;">panas</span> tanpa melihat perbedaan dan kaitannya dengan bentuk morfosintaksis kata-kata tersebut. Jadi, hasil analisis dalam makalah ini, yang tidak meliputi pengelompokan metafora konseptualnya, akan memberikan asumsi awal terhadap perbedaan distribusi pemakaian literal dan metaforis terhadap bentuk morfosintaksis kata-kata tersebut, yang selanjutnya dapat diujikan kembali menggunakan sampel yang lebih besar, medan leksikal lainnya, dan jenis korpus yang berbeda. Lebih lanjut, tujuan utama dari uji signifikansi statistik adalah untuk tidak mencoba membuktikan kebenaran H~1~, melainkan mencoba menggugurkan asumsi yang diajukan oleh H~0~ [periksa @gries_statistics_2013, hlm. 26-29 untuk ulasan lebih dalam].
+
+Terdapat sejumlah metode uji signifikansi statistik. Yang umum digunakan untuk menguji signifikansi distribusi variabel kategorikal seperti pada Tabel [\@ref(tab:cross-tab)](#cross-tab) adalah *Chi-Square test*^[Unsur *chi* dilafalkan *ky*, yang berima sama dengan *high* atau *fly* dalam Bahasa Inggris [@stefanowitsch_quantitative_2004].], yang dilambangkan dengan $\chi^{2}$ [@stefanowitsch_quantitative_2004; @gries_statistics_2013, hlm. 178-189; @levshina_how_2015, Bab 9; @janda_quantitative_2013, hlm. 9-14]. Yang dimaksud dengan "variabel kategorikal" (atau yang juga dikenal dengan variabel nominal) adalah variabel yang unsur-unsurnya memiliki ciri yang berbeda. Pada kasus ini, misalnya, variabel <span style = "font-variant:small-caps;">makna</span> mengandung unsur dengan ciri berbeda, yaitu *<span style = "font-variant:small-caps;">literal</span>* dan *<span style = "font-variant:small-caps;">metaforis</span>*. Jenis variabel lainnya adalah variabel ordinal (mis. *<span style = "font-variant:small-caps;">rendah</span>*, *<span style = "font-variant:small-caps;">sedang</span>*, *<span style = "font-variant:small-caps;">tinggi</span>*) dan *variabel rasio/numerik* (mis. panjang kata berdasarkan jumlah suku kata atau panjang suatu kalimat berdasarkan jumlah kata, dsj.), yang kaitan di antara unsurnya dapat dihubungkan dengan kalimat komparatif (mis. kata X dua kali lebih panjang dibandingkan kata Y berdasarkan jumlah suku katanya) [periksa @gries_statistics_2013, hlm. 16-17, untuk ulasan lebih dalam]. 
+
+## Uji signifikansi *Chi-Square* ($\chi^{2}$) {#chisquare}
+
+### Kekerapan Harapan dan Kekerapan Riil {#expvsobs}
+
+```{r chi-square, echo = FALSE}
+panas_chi <- chisq.test(panas_xtab, correct = FALSE)
+panas_cramv <- vcd::assocstats(panas_xtab)$cramer
+```
+
+
+```{r exp-table, echo = FALSE}
+row_sum <- rowSums(panas_xtab)
+col_sum <- colSums(panas_xtab)
+perc_lit_all <- row_sum[names(row_sum)== "lit"]/sum(row_sum) * 100
+perc_met_all <- row_sum[names(row_sum)== "met"]/sum(row_sum) * 100
+panas_xtab_exp <- panas_xtab_sum
+panas_xtab_exp_print <- panas_xtab_exp
+panas_xtab_exp_print[1:2,-grep("total", colnames(panas_xtab_exp_print))] <- ""
+```
+
+Untuk mengetahui apakah suatu distribusi muncul secara acak/kebetulan, hal yang pertama-tama mesti diketahui adalah bagaimana distribusi yang diharapkan muncul secara acak berdasarkan H~0~, atau yang dikenal dengan istilah **kekerapan harapan** (*expected frequency*, selanjutnya disingkat menjadi F~e~) [@gries_statistics_2013, hlm. 180; @levshina_how_2015, hlm. 210; @janda_quantitative_2013, hlm. 9]. Dalam hal ini, F~e~ adalah distribusi yang diharapkan muncul **apabila benar adanya** bahwa tidak ada hubungan antara bentuk morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span> dengan proporsi pemakaian literal dan metaforis (yaitu, H~0~) (periksa §[\@ref(signifikansi)](#signifikansi)). Tes $\chi^{2}$ melibatkan perbandingan antara F~e~ dan kekerapan yang diamati pada sampel data, yang disebut dengan **kekerapan riil** (*observed frequency*, disingkat F~o~). Berikut adalah rumus umum untuk menghitung F~e~ masing-masing sel, yaitu $E_{ij}$, di dalam tabel layaknya Tabel [\@ref(tab:cross-tab)](#cross-tab) [bdk. @levshina_how_2015, hlm. 211]:
+
+$$ E_{ij} = \frac {S_{i} \cdot S_{j}} N $$
+
+$S_{i}$ menunjukkan kekerapan marjinal total (*marginal frequency*) baris ${i}$, $S_{j}$ menunjukkan kekerapan total kolom ${j}$, dan ${N}$ adalah total pengamatan dalam sampel; jadi, F~e~ masing-masing sel ditentukan berdasarkan kekerapan total masing-masing kolom dan baris (ditandai dengan huruf miring pada Tabel [\@ref(tab:observed)](#observed), yang merupakan pengulangan Tabel [\@ref(tab:cross-tab)](#cross-tab)).
+
+```{r observed}
+xtb <- panas_xtab_sum
+xtb[3, ] <- paste("*", xtb[3,], "*", sep = "")
+xtb[1:2, grep("total", colnames(xtb))] <- paste("*", xtb[1:2, grep("total", colnames(xtb))], "*", sep = "")
+knitr::kable(xtb, caption = 'Kekerapan riil antara kategori <span style="font-variant:small-caps;">makna</span> dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span>')
+```
+
+Sebagai contoh, penghitungan F~e~ untuk sel pada persimpangan baris *lit* dan kolom *dipanasi* adalah $\frac {`r panas_xtab_sum["total", "dipanasi"]` \cdot `r panas_xtab_sum["lit", "total"]`} {`r panas_xtab_sum["total", "total"]`}$, yaitu `r round((panas_xtab_sum["total", "dipanasi"] * panas_xtab_sum["lit", "total"])/panas_xtab_sum["total", "total"], 3)`. Sebagai contoh tambahan, F~e~ untuk sel pada persimpangan *met* dan *memanas* adalah $\frac {`r panas_xtab_sum["total", "memanas"]` \cdot `r panas_xtab_sum["met", "total"]`} {`r panas_xtab_sum["total", "total"]`}$, yaitu `r round((panas_xtab_sum["total", "memanas"] * panas_xtab_sum["met", "total"])/panas_xtab_sum["total", "total"], 3)`. Tabel [\@ref(tab:expected)](#expected) menunjukkan nilai F~e~ untuk semua kombinasi kategori <span style="font-variant:small-caps;">makna</span> dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span>; nilai F~e~ tersebut telah dibulatkan menjadi 3 angka desimal setelah koma. Nilai total masing-masing kolom dan baris pada Tabel [\@ref(tab:expected)](#expected) akan sama dengan nilai total masing-masing baris dan kolom pada Tabel [\@ref(tab:observed)](#observed).
+
+```{r expected}
+panas_exp <- panas_chi$expected
+knitr::kable(round(panas_exp, 3), caption = 'Kekerapan harapan berdasarkan H~0~ antara kategori <span style="font-variant:small-caps;">makna</span> dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span>')
+```
+
+Setelah mengetahui **bagaimana** F~e~ diperoleh, mungkin muncul pertanyaan **mengapa** F~e~ dihitung sedemikian rupa. Penalarannya ialah sebagai berikut [periksa @gries_statistics_2013, hlm. 182-183; @stefanowitsch_quantitative_2004]. Kekerapan total masing-masing baris dan kolom adalah nilai yang tetap (*fix*) dan harus diterima apa adanya berdasarkan sampel (*given*); mereka menunjukkan (i) total sitiran literal dan metaforis dalam sampel, dan (ii) total sitiran sampel untuk masing-masing bentuk morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span>. Apabila nilai total tersebut terdistribusi secara acak untuk keduabelas persimpangan baris dan kolom dalam Tabel [\@ref(tab:observed)](#observed), yaitu *met*+*dipanasi*, *lit*+*dipanasi*, *met*+*dipanaskan*, *lit*+*dipanaskan*, dst., maka distribusinya harus proporsional, yang artinya dapat dipahami sebagai berikut. Terdapat `r row_sum[names(row_sum)== "lit"]` sitiran (dari total `r sum(row_sum)` sitiran) medan leksikal <span style = "font-variant:small-caps;">panas</span> yang menunjukkan pemakaian literal dan `r row_sum[names(row_sum)== "met"]` sisanya merupakan sitiran metaforis. Dengan kata lain, `r round(perc_lit_all, 2)`% dari total `r sum(row_sum)` sitiran medan leksikal <span style = "font-variant:small-caps;">panas</span> yang dikaji digunakan secara literal (yaitu, $\frac{`r row_sum[names(row_sum)== "lit"]`}{`r sum(row_sum)`} \cdot 100$) dan `r round(perc_met_all, 2)`%-nya digunakan secara metaforis (yaitu, $\frac{`r row_sum[names(row_sum)== "met"]`}{`r sum(row_sum)`} \cdot 100$). Apabila persebaran pemakaian literal dan metaforis untuk keenam kata medan leksikal <span style = "font-variant:small-caps;">panas</span> tersebut didasarkan atas kebetulan/bersifat acak (*based on chance*), persebarannya harus proporsional dengan persentase pemakaian literal dan metaforis secara umum seperti yang sudah dijelaskan sebelumnya. Artinya, `r round(perc_lit_all, 2)`% dari total sitiran untuk *panas*, *memanas*, *memanasi*, dst. seharusnya bermakna literal dan `r round(perc_met_all, 2)`% dari total sitiran untuk masing-masing kata tersebut seharusnya bermakna metaforis. Sebagai contoh, `r round(perc_lit_all, 2)`% dari total `r col_sum[names(col_sum) == "dipanasi"]` sitiran untuk *dipanasi* yang seharusnya bermakna literal adalah sekitar `r round(perc_lit_all/100 * col_sum[names(col_sum) == "dipanasi"], 3)` sitiran (yaitu, $\frac{`r round(perc_lit_all, 2)`}{100} \cdot 20$), nilai yang persis muncul pada sel untuk *lit*+*dipanasi* pada Tabel [\@ref(tab:expected)](#expected) di atas; pembaca dipersilakan untuk memeriksa sekaligus mencoba penghitungan serupa untuk sel lainnya.
+
+Dengan membandingkan nilai masing-masing sel pada Tabel [\@ref(tab:expected)](#expected) dan Tabel [\@ref(tab:observed)](#observed), kita dapat mengetahui kombinasi mana yang muncul lebih sering atau jarang dari yang diharapkan (periksa pula Gambar [\@ref(fig:assocplot)](#assocplot) pada §[\@ref(chisquare1)](#chisquare1)). Misalnya, *memanas* lebih sering dari yang diharapkan untuk digunakan secara metaforis. Tahap selanjutnya (§[\@ref(chisquare1)](#chisquare1)) ialah menghitung kadar perbedaan F~o~ terhadap F~e~ untuk mengetahui bahwa kekerapan riil yang diamati dalam sampel bukanlah suatu kebetulan.
+
+### Kontribusi sel terhadap nilai statistik $\chi^{2}$ dan tingkat signifikansi {#chisquare1}
+
+```{r chisq-tab, echo = FALSE}
+pvals <- matrix(rep(c(0.05, 0.01, 0.001), 5), byrow = TRUE, ncol = 3)
+df_vals <- matrix(rep(1:5, 3), byrow = FALSE, ncol = 3)
+critical_tab <- round(qchisq(pvals, df_vals, lower.tail = FALSE), 3)
+critical_tab <- as.data.frame(critical_tab)
+critical_tab <- data.frame(df = 1:5, critical_tab)
+critical_tab <- rbind(critical_tab, rep("...", 4))
+critical_tab <- dplyr::rename(critical_tab,
+                              `*p* = 0.05` = V1,
+                              `*p* = 0.01` = V2,
+                              `*p* = 0.001` = V3,
+                              `*df*` = df)
+critical_tab <- cbind(critical_tab, `...` = rep("...", 6))
+```
+
+
+Uji statistik $\chi^{2}$ mensyaratkan bahwa 80% dari nilai F~e~ pada tiap sel suatu tabel kekerapan harus lebih besar atau sama dengan 5 [@gries_statistics_2013, hlm. 166; periksa juga @levshina_how_2015, hlm. 212]. Apabila persyaratan tersebut tidak terpenuhi, atau nilai dalam tabulasi silang terlalu kecil, disarankan menggunakan uji signifikansi *Fisher-Yates Exact test* [@levshina_how_2015, hlm. 213-214]. Tabel [\@ref(tab:expected)](#expected) menunjukkan bahwa semua (`r sum(panas_chi$expected > 5)/length(panas_chi$expected) * 100`%) sel memiliki F~e~ lebih besar dari 5. Untuk mendapatkan nilai statistik $\chi^{2}$, kita mesti menghitung nilai kontribusi masing-masing sel terhadap $\chi^{2}$ (*"contribution to chi-squared"* [@gries_statistics_2013, hlm. 168]) yang dirumuskan sebagai berikut [@levshina_how_2015, hlm. 212; @stefanowitsch_quantitative_2004]:  
+
+$$\text{Pearson } \chi^{2} = \sum_{i=1}^{r} \sum_{j=1}^{c} \frac {(O_{ij}-E_{ij})^{2}} {E_{ij}}$$
+
+Rumus tersebut menunjukkan bahwa nilai $\chi^{2}$ merupakan hasil penjumlahan dari pemangkatan perbedaan F~o~ dengan F~e~ yang dibagi dengan F~e~ untuk tiap-tiap sel. Sebagai contoh, nilai kontribusi terhadap $\chi^{2}$ untuk sel *lit*+*dipanasi* adalah $\frac {(`r panas_xtab["lit", "dipanasi"]`-`r round(panas_exp["lit", "dipanasi"], 3)`)^{2}} {`r round(panas_exp["lit", "dipanasi"], 3)`}$, yaitu `r round((panas_xtab["lit", "dipanasi"] - panas_exp["lit", "dipanasi"])^2/panas_exp["lit", "dipanasi"], 3)`; ulangi penghitungan serupa untuk sel yang lain untuk selanjutnya dijumlahkan menjadi nilai statistik $\chi^{2}$, yang hasilnya adalah $\chi^{2}$ = `r round(unname(panas_chi$statistic), 3)`. Pertanyaan berikutnya ialah apakah nilai $\chi^{2}$ ini mengindikasikan perbedaan/penyimpangan (*deviation*) yang cukup besar oleh F~o~ terhadap F~e~ sehingga distribusi riil F~o~ pada Tabel [\@ref(tab:observed)](#observed) dapat dikatakan bukan suatu kebetulan? 
+
+Piranti statistik pada umumnya menggunakan nilai $\chi^{2}$ guna mengukur **peluang kesalahan** (*probability of error*), yang juga dikenal dengan sebutan *p-value* [@gries_statistics_2013, hlm. 27; @podesva_basic_2014, hlm. 317]. *P*-*value* menunjukkan peluang ditemukannya (i) distribusi dalam sampel (yaitu, F~o~ dalam Tabel [\@ref(tab:observed)](#observed)), dan juga (ii) penyimpangannya dari F~e~ yang diharapkan oleh H~0~, **ketika** H~0~ dianggap benar. Apabila peluang ini lebih kecil dari tingkat signifikansi 5% (§[\@ref(signifikansi)](#signifikansi)) mengingat H~0~ dianggap benar, maka (i) distribusi yang diamati dalam sampel dapat dikatakan signifikan secara statistik, yaitu tidak muncul berdasarkan suatu kebetulan, dan (ii) kita dapat menyangkal asumsi dari H~0~ dengan menunjukkan bahwa terdapat perbedaan distribusi, yang tidak bisa dikatakan sebagai suatu kebetulan, antara dua atau lebih variabel [@levshina_how_2015, hlm. 12; @gries_statistics_2013, hlm. 27]. Penyangkalan terhadap H~0~ ini tidak berarti bahwa H~1~ atau efek perbedaan yang ditemukan benar adanya karena masih terdapat probabilitas/peluang distribusi tersebut muncul secara kebetulan, meskipun sangat kecil [@podesva_basic_2014]. Sebelum adanya komputer, cara klasik untuk menentukan tingkat signifikansi suatu distribusi ialah membandingkan nilai $\chi^{2}$ yang diperoleh berdasarkan sampel (yaitu $\chi^{2}$ = `r round(unname(panas_chi$statistic), 3)`) dengan tabel nilai $\chi^{2}$ seperti yang ditunjukkan pada Tabel [\@ref(tab:critical-tab)](#critical-tab) [@gries_statistics_2013, hlm. 184].
+
+```{r critical-tab}
+knitr::kable(critical_tab, caption = "Nilai $\\chi^{2}$ untuk tingkat signifikansi (*p*~*critical*~) = 0.05 (5%), 0.01 (1%), dan 0.001 (0.1%) untuk 1 $\\le$ *df* $\\le$ 5")
+```
+
+Kolom *df* menunjukkan *degree of freedom* [@levshina_how_2015, hlm. 12] dari suatu tabel distribusi. *Df* secara singkat mengacu pada jumlah nilai yang dapat berubah (*vary*). Rumus mengukur nilai *df*, dan nilai *df* untuk tabel distribusi pada makalah ini, adalah sebagai berikut:
+
+$$ \textit{df} = (\text{N baris - 1}) \cdot (\text{N kolom - 1}) = (`r nrow(panas_xtab)` - 1) \cdot (`r ncol(panas_xtab)` - 1) = `r (nrow(panas_xtab) - 1) * (ncol(panas_xtab) - 1)` $$
+
+Nilai *df* = `r unname(panas_chi$parameter)`, dengan kekerapan marjinal total yang tetap, menunjukkan bahwa hanya `r unname(panas_chi$parameter)` sel dari Tabel [\@ref(tab:observed)](#observed) yang nilainya dapat diubah tanpa mengubah jumlah kekerapan marjinalnya [bdk. @levshina_how_2015, hlm. 12].
+
+Jadi, untuk mengetahui signifikansi distribusi pemakaian literal dan metaforis dari medan leksikal <span style = "font-variant:small-caps;">panas</span>, kita mulai dengan baris yang menunjukkan nilai *df* = `r unname(panas_chi$parameter)` dan memeriksa apakah nilai $\chi^{2}$ = `r round(unname(panas_chi$statistic), 3)` yang diperoleh lebih besar dari nilai $\chi^{2}$ yang ada pada baris tersebut pada Tabel [\@ref(tab:critical-tab)](#critical-tab). Terlihat jelas bahwa nilai $\chi^{2}$ yang diperoleh dalam sampel hampir sekitar sembilan kali lebih besar dari nilai $\chi^{2}$ yang ada pada kolom signifikansi 0.1% (yaitu kolom *p* = 0.001 dengan $\chi^{2}$ = `r critical_tab[5, "*p* = 0.001"]`). Hal ini menunjukkan bahwa terdapat peluang yang sangat kecil (lebih kecil dari 0.1% atau *p* < 0.001) untuk menemukan perbedaan distribusi antara bentuk morfosintaksis dan tipe makna pada Tabel [\@ref(tab:observed)](#observed) apabila (i) perbedaan tersebut dianggap sebagai suatu kebetulan, dan (ii) tidak ada keterkaitan antara bentuk morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span> dan makna (non-)metaforis. 
+
+```{r cramers-v, echo = FALSE}
+cramersv <- round(unname(sqrt(panas_chi$statistic/sum(panas_xtab) * (min(dim(panas_xtab)) - 1))), 3)
+```
+
+Nilai statistik lain yang mesti dilaporkan selain *p*-*value* ialah **kadar efek** (*effect size*) [@janda_quantitative_2013, hlm. 11]. Berbeda dengan *p*-*value* yang menunjukkan peluang acak tidaknya kemunculan suatu distribusi, kadar efek menunjukkan seberapa penting dan kuat efek hubungan/korelasi di antara kedua variabel. Untuk tabel kekerapan dengan jumlah baris dan/atau kolom di atas dua, kadar efek yang dilaporkan ialah *Cramér's V* [@levshina_how_2015, hlm. 217; @gries_statistics_2013, hlm. 185-186; @janda_quantitative_2013, hlm. 10]. Rentangan nilai *Cramér's V* ialah antara 0 (tidak ada hubungan) dan 1 (hubungan sempurna): (i) 0.1 adalah ambang batas untuk kadar efek **kecil** yang dapat dilaporkan; (ii) 0.3 untuk kadar efek **cukup** (*moderate*); dan (iii) 0.5 untuk kadar efek **besar/kuat** (*robust*) [@janda_quantitative_2013, hlm. 10-11; bdk. @levshina_how_2015, hlm. 209]. Berikut ini adalah rumus penghitungan *Cramér's V* [@gries_statistics_2013, hlm. 186]:
+
+$$ \text{Cramér's } \textit{V} = \sqrt{ \frac{\chi^{2}}{N \cdot \left( min [N_{baris}, N_{kolom}] - 1 \right)} } = \sqrt{ \frac{`r round(panas_chi$statistic, 3)`}{`r sum(panas_xtab)` \cdot \left(`r min(dim(panas_xtab))` - 1 \right)} } = `r round(cramersv, 3)` $$
+
+Jadi, hasil analisis statistik *Chi-Square* menunjukkan perbedaan distribusi yang **sangat signifikan** dan keterkaitan yang **kuat** antara bentuk morfosintaksis kata dalam medan leksikal <span style = "font-variant:small-caps;">panas</span> dan pemakaian literal dan metaforisnya (*N* = `r sum(panas_xtab)`; $\chi^{2}$ = `r round(unname(panas_chi$statistic), 3)`; *df* = `r unname(panas_chi$parameter)`; *p* < 0.001; *Cramér's V* = `r round(cramersv, 3)`) [bdk. @deignan_grammar_2006]. Gambar [\@ref(fig:assocplot)](#assocplot), yang dihasilkan melalui modul R *vcd*, merupakan **bagan asosiasi** yang secara lebih jelas menunjukkan **arah** dan **besar** nilai penyimpangan F~o~ terhadap F~e~ masing-masing sel terkait dua variabel yang dikaji [@levshina_how_2015, hlm. 220; @gries_statistics_2013, hlm. 188].
+
+```{r assocplot, fig.cap = 'Bagan asosiasi kategori <span style = "font-variant:small-caps;">makna</span> dan <span style = "font-variant:small-caps;">bentuk morfosintaksis</span> medan leksikal <span style = "font-variant:small-caps;">panas</span>'}
+labels_args <- list(rot_labels = c(top = 45, left = 0),
+                    varnames = c(FALSE, FALSE))
+vcd::assoc(panas_xtab,
+           labeling_args = labels_args,
+           shade = TRUE)
+```
+
+Nilai *Pearson residuals* menunjukkan besar nilai efek perbedaan antara kekerapan riil (F~o~) dan kekerapan harapan (F~e~) masing-masing sel [@gries_statistics_2013, hlm. 187-188; @levshina_how_2015, hlm. 218-219]. Semakin besar nilai absolut residual masing-masing sel, semakin besar penyimpangan F~o~ terhadap F~e~, dan semakin besar kontribusi sel tersebut terhadap nilai statistik $\chi^{2}$ keseluruhan. Efek yang berkontribusi kuat terhadap keterkaitan signifikan antara variabel <span style = "font-variant:small-caps;">makna</span> dan <span style = "font-variant:small-caps;">bentuk morfosintaksis</span> ditunjukkan melalui dua unsur: (i) panjang-pendeknya diagram batang yang dapat menjulang ke atas (residual positif, yaitu F~o~ > F~e~) atau terbalik ke bawah (residual negatif, yaitu F~o~ < F~e~); dan (ii) kegelapan warna diagram batang masing-masing sel (semakin gelap warnanya, semakin besar efek perbedaan F~o~ terhadap F~e~) [bdk. @levshina_how_2015, hlm. 220]. Berdasarkan informasi ini, tampak bahwa verba inkohatif *memanas* adalah satu-satunya bentuk yang berasosiasi paling kuat dengan pemakaian metaforis dibandingkan pemakaian literalnya. Sedangkan bentuk pasif kausatif *dipanaskan* dan bentuk akar *panas* berasosiasi negatif dengan pemakaian metaforis dalam sampel; *dipanaskan* juga satu-satunya bentuk yang berasosiasi cukup kuat dengan pemakaian literal dalam sampel. Hasil ini menunjukkan bahwa (i) makna tertentu bisa memiliki kecenderungan (atau rasio yang lebih tinggi) untuk diungkapkan dalam bentuk morfosintaksis kata tertentu, dan (ii) keberpasangan bentuk-dan-makna tersebut dapat ditentukan secara lebih terukur dengan merumuskannya secara kuantitatif [bdk. @janda_linguistic_2016].
+
+## Uji signifikansi $\chi^{2}$ dengan R {#chisqr}
+
+Pemaparan rinci dan bertahap sebelumnya terkait $\chi^{2}$ dan uji signifikansi secara umum penting untuk dipahami sebelum prosesnya dipermudah dengan bantuan piranti komputasional seperti R. Nukilan kode berikut menunjukkan tahapan melakukan analisis $\chi^{2}$ dengan R. Pertama-tama, data mentah makalah ini, yaitu berkas `panas_raw.txt` yang disimpan dalam folder `data`, mesti dimuat ke dalam R dan disimpan ke dalam objek bernama `panas` (lihat kembali Tabel [\@ref(tab:conc)](#conc)). Data ini selanjutnya digunakan untuk membuat tabulasi kekerapan seperti Tabel [\@ref(tab:observed)](#observed).
+
+```{r chisq-tuts1, echo = TRUE}
+# muat data konkordansi ke dalam R
+# dan simpan ke objek `panas`
+panas <- read.table(file = "data/panas_raw.txt", 
+                    header = TRUE, 
+                    sep = "\t", 
+                    quote = "", 
+                    comment.char = "", 
+                    stringsAsFactors = FALSE)
+
+# buat tabel kekerapan antara kolom use & kolom node
+panas_tbl <- table(panas$use, panas$node)
+
+# periksa tampilan tabel
+panas_tbl
+```
+
+Analisis $\chi^{2}$ pada R dilakukan dengan fungsi `chisq.test()` dengan masukan berupa tabulasi data `panas_tbl` yang dihasilkan sebelumnya.
+
+```{r chisq-tuts2, echo = TRUE}
+# Uji signifikansi dengan fungsi `chisq.test()`
+# dan simpan hasil ke objek `panas_chi`
+panas_chi <- chisq.test(panas_tbl)
+
+# tampilkan hasil
+panas_chi
+```
+
+Luaran dari `chisq.test()` terdiri dari beberapa unsur, di antaranya (i) `statistic` yang menunjukkan nilai $\chi^{2}$; (ii) `parameter` untuk nilai *df*; (iii) `p.value`, yaitu *p* < 2.2e-16^[Nilai 2.2e-16 merupakan tampilan ilmiah untuk bilangan desimal `r format(2.2e-16, scientific = FALSE)` yang mengandung 15 angka 0 setelah koma dan diikuti angka 22.] pada tampilan hasil di atas; (iv) `observed` (atau F~o~); (v) `expected` (atau F~h~); (vi) `residuals`, yang merupakan nilai *Pearson residuals* (Gambar [\@ref(fig:assocplot)](#assocplot)). Isi dari masing-masing unsur tersebut dapat diperoleh menggunakan tanda mata uang dolar (`$`) sebagai berikut:
+
+```{r chisq-tuts3, echo = TRUE}
+# tampilkan nilai chi-square
+panas_chi$statistic
+
+# tampilkan nilai probabilitas
+panas_chi$p.value
+
+# tampilkan tabel kekerapan harapan
+panas_chi$expected
+
+# tampilkan tabel nilai Pearson residuals
+panas_chi$residuals
+```
+
+Nilai kontribusi terhadap $\chi^{2}$ untuk masing-masing sel merupakan hasil pangkat 2 dari nilai *Pearson residuals* masing-masing sel:
+
+```{r contrib-to-chisq, echo = TRUE}
+# hitung kontribusi terhadap chi-square
+panas_chi$residuals^2
+```
+
+Selanjutnya, nilai kadar efek *Cramér's V* dihitung dengan kode berikut:
+
+```{r cramers-tuts, echo = TRUE}
+# ambil nilai chi-square
+# dan hilangkan label nama
+chistats <- panas_chi$statistic
+chistats <- unname(chistats)
+
+# ambil nilai terkecil dari jumlah baris dan kolom `panas_tbl`
+min_dim <- min(nrow(panas_tbl), ncol(panas_tbl)) 
+
+# total pengamatan "N"
+N <- sum(panas_tbl)
+
+# hitung Cramér's V berdasarkan rumus di atas
+# lalu bulatkan hasil menjadi 3 angka desimal
+cramersv <- sqrt(chistats/(N * (min_dim - 1)))
+round(cramersv, digits = 3)
+```
+
+
+
+# Penutup
+
+Makalah ini telah mengulas pemahaman kuantitatif mendasar atas uji signifikansi *Chi-Square* dalam mengkaji hubungan antara bentuk dan makna pada kasus distribusi makna (non-)metaforis medan leksikal <span style = "font-variant:small-caps;">panas</span> dalam Bahasa Indonesia. Ditemukan bahwa terdapat hubungan yang sangat signifikan dan kuat antara realisasi morfosintaksis medan leksikal <span style = "font-variant:small-caps;">panas</span> dan makna literal dan metaforisnya ([§\@ref(chisquare1)](#chisquare1)). Dengan menggunakan metode kuantitatif, ditunjukkan pula bahwa hubungan antara bentuk dan makna bukan merupakan soal hitam-putih, namun bersifat gradien, dan sifat ini sebaiknya dicirikan berdasarkan distribusi statistik. Contohnya, meskipun *memanas* bisa digunakan dengan makna literal, namun bentuk inkohatif ini lebih condong dari yang diharapkan untuk digunakan secara metaforis; sebaliknya bentuk pasif kausatif *dipanaskan* jauh lebih lazim digunakan secara literal (Gambar [\@ref(fig:assocplot)](#assocplot)). Kecenderungan statistik seperti ini akan sulit untuk diungkap dengan mengandalkan metode introspeksi. Pertanyaan terkait mengapa bentuk-bentuk tersebut memiliki perilaku semantis yang berbeda belum dapat dijawab kali ini. Setidaknya, hasil analisis ini dalam Bahasa Indonesia mendukung temuan serupa dalam Bahasa Inggris [@deignan_grammar_2006] terkait hubungan bentuk gramatikal suatu kata dengan perbedaan proporsi pemakaian metaforis dan literalnya. Kajian ini juga telah (i) memberikan bukti empiris terkait asumsi bahwa bentuk yang berbeda memiliki batasan semantis yang berbeda (§[\@ref(pendahuluan)](#pendahuluan)), dan (ii) menunjukkan bagaimana asumsi tersebut dapat dirumuskan berdasarkan distribusi kuantitatif dalam korpus.
+
+Penerapan uji statistik analitik (*analytical statistics*) seperti pada makalah ini mengijinkan peneliti untuk menentukan tingkat keumuman (*generalisation*) temuan berdasarkan sampel terhadap keseluruhan populasi, dalam hal ini semua populasi pemakaian medan leksikal <span style = "font-variant:small-caps;">panas</span> yang dikaji, khususnya pada jenis teks daring yang mendasari korpus IWaC. Namun, jenis teks dari korpus yang digunakan merupakan salah satu faktor yang pada kesempatan ini belum dapat dipertimbangkan dengan seksama. Hasil berbeda dari makalah ini bisa muncul jika menggunakan korpus dengan tema berbeda (misalnya novel); ini adalah pertanyaan empiris yang juga mesti dibuktikan melalui penelitian berbeda. Selain perihal korpus, keterkaitan signifikan dan kuat yang ditemukan juga terbatas pada kata-kata dari satu jenis medan leksikal semantik, yaitu <span style = "font-variant:small-caps;">panas</span>; kajian sistematis terhadap jenis medan leksikal lainnya masih perlu dilakukan. Terlepas dari batasan-batasan tersebut, makalah ini sedikitnya telah mencontohkan bagaimana salah satu pertanyaan mendasar dalam linguistik dapat dikaji menggunakan metode kuantitatif, khususnya *Chi-square*. Mengingat peta kelinguistikan setakat ini bergerak ke arah komputasional, kuantitatif, dan mengandalkan data tekstual yang besar (*big data*), maka pemahaman terhadap metode kuantitatif dan piranti komputasional, seperti R, menjadi investasi berharga bagi generasi peneliti bahasa abad ke-21. 
+
+# Daftar pustaka {-}
