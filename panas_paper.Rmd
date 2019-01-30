@@ -306,7 +306,7 @@ panas_chi <- chisq.test(panas_tbl)
 panas_chi
 ```
 
-Luaran dari `chisq.test()` terdiri dari beberapa unsur, di antaranya (i) `statistic` yang menunjukkan nilai $\chi^{2}$; (ii) `parameter` untuk nilai *df*; (iii) `p.value`, yaitu *p* < 2.2e-16^[Nilai 2.2e-16 merupakan tampilan ilmiah untuk bilangan desimal `r format(2.2e-16, scientific = FALSE)` yang mengandung 15 angka 0 setelah koma dan diikuti angka 22.] pada tampilan hasil di atas; (iv) `observed` (atau F~o~); (v) `expected` (atau F~h~); (vi) `residuals`, yang merupakan nilai *Pearson residuals* (Gambar [\@ref(fig:assocplot)](#assocplot)). Isi dari tiap-tiap unsur tersebut dapat diperoleh menggunakan tanda mata uang dolar (`$`) sebagai berikut:
+Luaran dari `chisq.test()` terdiri dari beberapa unsur, di antaranya (i) `statistic` yang menunjukkan nilai $\chi^{2}$; (ii) `parameter` untuk nilai *df*; (iii) `p.value`, yaitu *p* < 2.2e-16^[Nilai 2.2e-16 merupakan tampilan ilmiah untuk bilangan desimal `r format(2.2e-16, scientific = FALSE)` yang mengandung 15 angka 0 setelah koma dan diikuti angka 22.] pada tampilan hasil di atas; (iv) `observed` (atau F~o~); (v) `expected` (atau F~e~); (vi) `residuals`, yang merupakan nilai *Pearson residuals* (Gambar [\@ref(fig:assocplot)](#assocplot)). Isi dari tiap-tiap unsur tersebut dapat diperoleh menggunakan tanda mata uang dolar (`$`) sebagai berikut:
 
 ```{r chisq-tuts3, echo = TRUE}
 # tampilkan nilai chi-square
