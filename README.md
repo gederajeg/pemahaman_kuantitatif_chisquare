@@ -7,7 +7,7 @@ Data and Source R Markdown files with codes for *Pemahaman kuantitatif dasar dan
 
 [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-The paper (in Indonesian) has just been accepted (with minor revision) for open-access publication in [*Linguistik Indonesia*](http://www.linguistik-indonesia.org), the flagship journal for the Linguistic Society of Indonesia ([*Masyarakat Linguistik Indonesia*](http://www.mlindonesia.org) \[MLI\]). The materials in this repository are licensed under the [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/). See the `LICENSE` file for the details.
+The paper (in Indonesian) has just been accepted (with minor revision) for open-access publication in [*Linguistik Indonesia*](http://www.linguistik-indonesia.org), the flagship journal for the Linguistic Society of Indonesia ([*Masyarakat Linguistik Indonesia*](http://www.mlindonesia.org) \[MLI\]). The post-print version of the paper is available on [INA-Rxiv](https://doi.org/10.31227/osf.io/bt4h7), the Indonesian Preprint Server. The materials in this repository are licensed under the [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/). See the `LICENSE` file for the details.
 
 The folder `data` contains the raw concordance file in plain text format (i.e. `panas_raw.txt`) used in the paper. The file `panas_sample.txt` is used as illustrative subset of the raw data.
 
@@ -17,41 +17,56 @@ The repository also includes an [RStudio](https://www.rstudio.com) project (i.e.
 
 ``` r
 devtools::session_info()
-#> Session info -------------------------------------------------------------
+#> ─ Session info ──────────────────────────────────────────────────────────
 #>  setting  value                       
 #>  version  R version 3.5.1 (2018-07-02)
+#>  os       macOS  10.14.3              
 #>  system   x86_64, darwin15.6.0        
 #>  ui       X11                         
 #>  language (EN)                        
 #>  collate  en_US.UTF-8                 
+#>  ctype    en_US.UTF-8                 
 #>  tz       Australia/Melbourne         
-#>  date     2019-01-29
-#> Packages -----------------------------------------------------------------
-#>  package   * version date       source        
-#>  backports   1.1.2   2017-12-13 CRAN (R 3.5.0)
-#>  base      * 3.5.1   2018-07-05 local         
-#>  compiler    3.5.1   2018-07-05 local         
-#>  datasets  * 3.5.1   2018-07-05 local         
-#>  devtools    1.13.6  2018-06-27 CRAN (R 3.5.0)
-#>  digest      0.6.15  2018-01-28 CRAN (R 3.5.0)
-#>  evaluate    0.11    2018-07-17 CRAN (R 3.5.0)
-#>  graphics  * 3.5.1   2018-07-05 local         
-#>  grDevices * 3.5.1   2018-07-05 local         
-#>  htmltools   0.3.6   2017-04-28 CRAN (R 3.5.0)
-#>  knitr       1.20    2018-02-20 CRAN (R 3.5.0)
-#>  magrittr    1.5     2014-11-22 CRAN (R 3.4.0)
-#>  memoise     1.1.0   2017-04-21 CRAN (R 3.4.0)
-#>  methods   * 3.5.1   2018-07-05 local         
-#>  Rcpp        0.12.18 2018-07-23 CRAN (R 3.5.1)
-#>  rmarkdown   1.10    2018-06-11 CRAN (R 3.5.0)
-#>  rprojroot   1.3-2   2018-01-03 CRAN (R 3.4.3)
-#>  stats     * 3.5.1   2018-07-05 local         
-#>  stringi     1.2.4   2018-07-20 CRAN (R 3.5.0)
-#>  stringr     1.3.1   2018-05-10 cran (@1.3.1) 
-#>  tools       3.5.1   2018-07-05 local         
-#>  utils     * 3.5.1   2018-07-05 local         
-#>  withr       2.1.2   2018-03-15 cran (@2.1.2) 
-#>  yaml        2.2.0   2018-07-25 cran (@2.2.0)
+#>  date     2019-02-24                  
+#> 
+#> ─ Packages ──────────────────────────────────────────────────────────────
+#>  package     * version date       lib source        
+#>  assertthat    0.2.0   2017-04-11 [1] CRAN (R 3.4.0)
+#>  backports     1.1.2   2017-12-13 [1] CRAN (R 3.5.0)
+#>  callr         3.1.1   2018-12-21 [1] CRAN (R 3.5.0)
+#>  cli           1.0.1   2018-09-25 [1] CRAN (R 3.5.0)
+#>  crayon        1.3.4   2017-09-16 [1] CRAN (R 3.4.1)
+#>  desc          1.2.0   2018-05-01 [1] CRAN (R 3.5.0)
+#>  devtools      2.0.1   2018-10-26 [1] CRAN (R 3.5.1)
+#>  digest        0.6.15  2018-01-28 [1] CRAN (R 3.5.0)
+#>  evaluate      0.11    2018-07-17 [1] CRAN (R 3.5.0)
+#>  fs            1.2.3   2018-06-08 [1] CRAN (R 3.5.0)
+#>  glue          1.3.0   2018-07-17 [1] CRAN (R 3.5.0)
+#>  htmltools     0.3.6   2017-04-28 [1] CRAN (R 3.5.0)
+#>  knitr         1.20    2018-02-20 [1] CRAN (R 3.5.0)
+#>  magrittr      1.5     2014-11-22 [1] CRAN (R 3.4.0)
+#>  memoise       1.1.0   2017-04-21 [1] CRAN (R 3.4.0)
+#>  pkgbuild      1.0.2   2018-10-16 [1] CRAN (R 3.5.0)
+#>  pkgload       1.0.2   2018-10-29 [1] CRAN (R 3.5.0)
+#>  prettyunits   1.0.2   2015-07-13 [1] CRAN (R 3.5.0)
+#>  processx      3.2.1   2018-12-05 [1] CRAN (R 3.5.0)
+#>  ps            1.3.0   2018-12-21 [1] CRAN (R 3.5.0)
+#>  R6            2.3.0   2018-10-04 [1] CRAN (R 3.5.0)
+#>  Rcpp          1.0.0   2018-11-07 [1] CRAN (R 3.5.0)
+#>  remotes       2.0.2   2018-10-30 [1] CRAN (R 3.5.0)
+#>  rlang         0.3.1   2019-01-08 [1] CRAN (R 3.5.2)
+#>  rmarkdown     1.11    2018-12-08 [1] CRAN (R 3.5.0)
+#>  rprojroot     1.3-2   2018-01-03 [1] CRAN (R 3.4.3)
+#>  sessioninfo   1.1.1   2018-11-05 [1] CRAN (R 3.5.0)
+#>  stringi       1.2.4   2018-07-20 [1] CRAN (R 3.5.0)
+#>  stringr       1.3.1   2018-05-10 [1] CRAN (R 3.4.4)
+#>  testthat      2.0.1   2018-10-13 [1] CRAN (R 3.5.0)
+#>  usethis       1.4.0   2018-08-14 [1] CRAN (R 3.5.0)
+#>  withr         2.1.2   2018-03-15 [1] CRAN (R 3.4.4)
+#>  yaml          2.2.0   2018-07-25 [1] CRAN (R 3.5.0)
+#> 
+#> [1] /Users/Primahadi/Rlibs
+#> [2] /Library/Frameworks/R.framework/Versions/3.5/Resources/library
 ```
 
 References
