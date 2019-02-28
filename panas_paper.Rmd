@@ -122,7 +122,7 @@ Tampak bahwa, misalnya, pemakaian literal bentuk pasif *dipanasi* (`r nrow(panas
 
 ```{r prop-table}
 panas_prop <- prop.table(panas_xtab, 2)
-panas_prop_df <- dplyr::as_data_frame(panas_prop)
+panas_prop_df <- tibble::as_tibble(panas_prop)
 knitr::kable(round(panas_prop, 2), caption = 'Kekerapan relatif/proporsi antara kategori <span style="font-variant:small-caps;">makna</span> dan <span style="font-variant:small-caps;">bentuk morfosintaksis</span>')
 ```
 
