@@ -5,7 +5,7 @@ Data and Source R Markdown files with codes for *Pemahaman kuantitatif dasar dan
 
 [**Gede Primahadi Wijaya Rajeg**](https://figshare.com/authors/Gede_Primahadi_Wijaya_Rajeg/1234749) <a itemprop="sameAs" content="https://orcid.org/0000-0002-2047-8621" href="https://orcid.org/0000-0002-2047-8621" target="orcid.widget" rel="noopener noreferrer" style="vertical-align:top;"><img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" style="width:1em;margin-right:.5em;" alt="ORCID iD icon">orcid.org/0000-0002-2047-8621</a> <br>[**I Made Rajeg**](https://figshare.com/authors/I_Made_Rajeg/4052377) <a itemprop="sameAs" content="https://orcid.org/0000-0001-8989-0203" href="https://orcid.org/0000-0001-8989-0203" target="orcid.widget" rel="noopener noreferrer" style="vertical-align:top;"><img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" style="width:1em;margin-right:.5em;" alt="ORCID iD icon">orcid.org/0000-0001-8989-0203</a>
 
-[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/) [![DOI](https://img.shields.io/badge/doi-10.26180/5c6e1160b8d8a-blue.svg?style=flat)](http://dx.doi.org/10.26180/5c6e1160b8d8a)
 
 The paper (in Indonesian) has just been accepted (with minor revision) for open-access publication in [*Linguistik Indonesia*](http://www.linguistik-indonesia.org), the flagship journal for the Linguistic Society of Indonesia ([*Masyarakat Linguistik Indonesia*](http://www.mlindonesia.org) \[MLI\]). The post-print version of the paper is available on [INA-Rxiv](https://doi.org/10.31227/osf.io/bt4h7), the Indonesian Preprint Server. The materials in this repository are licensed under the [Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/). See the `LICENSE` file for the details.
 
@@ -27,7 +27,7 @@ devtools::session_info()
 #>  collate  en_US.UTF-8                 
 #>  ctype    en_US.UTF-8                 
 #>  tz       Australia/Melbourne         
-#>  date     2019-02-24                  
+#>  date     2019-03-05                  
 #> 
 #> ─ Packages ──────────────────────────────────────────────────────────────
 #>  package     * version date       lib source        
